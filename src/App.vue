@@ -9,6 +9,8 @@ import WelcomeScreen from './components/WelcomeScreen.vue'
 import WireGame from './components/WireGame.vue'
 import { launchConfetti } from './utils/canvasConfetti'
 
+import { reactive, toRefs } from 'vue'
+
 export default {
   components: {
     AppFooter,
@@ -20,8 +22,8 @@ export default {
     WelcomeScreen,
     WireGame
   },
-  data() {
-    return {
+  setup() {
+    const state = reactive({
       activeScreen: 'Not Started',
       miniGames: [
         {
@@ -40,6 +42,9 @@ export default {
           complete: false
         }
       ]
+    })
+    return {
+      ...toRefs(state)
     }
   },
   computed: {
