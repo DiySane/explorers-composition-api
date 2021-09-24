@@ -9,7 +9,7 @@ import WelcomeScreen from './components/WelcomeScreen.vue'
 import WireGame from './components/WireGame.vue'
 import { launchConfetti } from './utils/canvasConfetti'
 
-import { reactive, toRefs } from 'vue'
+import { computed, reactive, toRefs } from 'vue'
 
 export default {
   components: {
@@ -41,31 +41,30 @@ export default {
           label: 'Match Wires',
           complete: false
         }
-      ]
+      ],
+      gameComplete: computed(() => {
+        return state.miniGames.reduce(
+          (accumulator, currentValue) => accumulator && currentValue.complete,
+          true
+        )
+      }),
+      taskProgress: computed(() => {
+        let completedTasks = 0
+
+        state.miniGames.forEach(miniGame => {
+          if (miniGame.complete) {
+            completedTasks += 1
+          }
+        })
+
+        return Math.floor((completedTasks / 3) * 100)
+      })
     })
     return {
       ...toRefs(state)
     }
   },
-  computed: {
-    gameComplete() {
-      return this.miniGames.reduce(
-        (accumulator, currentValue) => accumulator && currentValue.complete,
-        true
-      )
-    },
-    taskProgress() {
-      let completedTasks = 0
-
-      this.miniGames.forEach(miniGame => {
-        if (miniGame.complete) {
-          completedTasks += 1
-        }
-      })
-
-      return Math.floor((completedTasks / 3) * 100)
-    }
-  },
+  computed: {},
   methods: {
     registerSelection(gameId) {
       this.activeScreen = gameId
