@@ -1,9 +1,9 @@
 <script>
-import { computed, reactive, toRefs } from 'vue'
+import { computed, onMounted, reactive, toRefs } from 'vue'
 import { PASSWORD_STATUS } from '../constants'
 
 export default {
-  setup: () => {
+  setup: (props, context) => {
     const state = reactive({
       status: 'In Progress',
       passwordInput: '',
@@ -34,7 +34,7 @@ export default {
     const checkPassword = () => {
       if (state.correctPassword === state.passwordInput) {
         state.status = PASSWORD_STATUS.PASS
-        state.$emit('mini-game-won', 'password-game')
+        context.emit('mini-game-won', 'password-game')
       } else {
         state.status = PASSWORD_STATUS.FAIL
       }
@@ -44,10 +44,11 @@ export default {
       return Math.floor(Math.random() * 1000000 + 1000).toString()
     }
 
+    onMounted(() => {
+      state.correctPassword = generateNewPassword()
+    })
+
     return { ...toRefs(state), checkPassword, generateNewPassword }
-  },
-  mounted() {
-    this.correctPassword = this.generateNewPassword()
   },
   watch: {
     status(gameState) {
