@@ -9,7 +9,7 @@ import WelcomeScreen from './components/WelcomeScreen.vue'
 import WireGame from './components/WireGame.vue'
 import { launchConfetti } from './utils/canvasConfetti'
 
-import { computed, reactive, toRefs } from 'vue'
+import { computed, reactive, toRefs, watch } from 'vue'
 
 export default {
   components: {
@@ -83,19 +83,21 @@ export default {
       miniGame.complete = true
     }
 
+    watch(
+      () => state.activeScreen,
+      currentScreen => {
+        if (currentScreen === 'Home' && state.gameComplete) {
+          launchConfetti()
+        }
+      }
+    )
+
     return {
       ...toRefs(state),
       registerSelection,
       restartGame,
       startGame,
       updateMiniGame
-    }
-  },
-  watch: {
-    activeScreen(screen) {
-      if (screen === 'Home' && this.gameComplete) {
-        launchConfetti()
-      }
     }
   }
 }
