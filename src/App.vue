@@ -1,4 +1,5 @@
 <script>
+import { reactive, toRefs } from 'vue'
 import AppFooter from './components/AppFooter.vue'
 import HomeScreen from './components/HomeScreen.vue'
 import MiniGame from './components/MiniGame.vue'
