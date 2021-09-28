@@ -9,6 +9,8 @@ import WelcomeScreen from './components/WelcomeScreen.vue'
 import WireGame from './components/WireGame.vue'
 import { launchConfetti } from './utils/canvasConfetti'
 
+import { computed, reactive, toRefs, watch } from 'vue'
+
 export default {
   components: {
     AppFooter,
@@ -20,8 +22,8 @@ export default {
     WelcomeScreen,
     WireGame
   },
-  data() {
-    return {
+  setup() {
+    const state = reactive({
       activeScreen: 'Not Started',
       miniGames: [
         {
@@ -39,53 +41,63 @@ export default {
           label: 'Match Wires',
           complete: false
         }
-      ]
-    }
-  },
-  computed: {
-    gameComplete() {
-      return this.miniGames.reduce(
-        (accumulator, currentValue) => accumulator && currentValue.complete,
-        true
-      )
-    },
-    taskProgress() {
-      let completedTasks = 0
+      ],
+      gameComplete: computed(() => {
+        return state.miniGames.reduce(
+          (accumulator, currentValue) => accumulator && currentValue.complete,
+          true
+        )
+      }),
+      taskProgress: computed(() => {
+        let completedTasks = 0
 
-      this.miniGames.forEach(miniGame => {
-        if (miniGame.complete) {
-          completedTasks += 1
-        }
+        state.miniGames.forEach(miniGame => {
+          if (miniGame.complete) {
+            completedTasks += 1
+          }
+        })
+
+        return Math.floor((completedTasks / 3) * 100)
       })
+    })
 
-      return Math.floor((completedTasks / 3) * 100)
+    const registerSelection = gameId => {
+      state.activeScreen = gameId
     }
-  },
-  methods: {
-    registerSelection(gameId) {
-      this.activeScreen = gameId
-    },
-    restartGame() {
-      this.miniGames.forEach(miniGame => {
+
+    const restartGame = () => {
+      state.miniGames.forEach(miniGame => {
         miniGame.complete = false
       })
 
-      this.activeScreen = 'Not Started'
-    },
-    startGame() {
-      this.activeScreen = 'Home'
-    },
-    updateMiniGame(id) {
-      const miniGame = this.miniGames.find(miniGame => miniGame.id === id)
+      state.activeScreen = 'Not Started'
+    }
+
+    const startGame = () => {
+      state.activeScreen = 'Home'
+    }
+
+    const updateMiniGame = id => {
+      const miniGame = state.miniGames.find(miniGame => miniGame.id === id)
 
       miniGame.complete = true
     }
-  },
-  watch: {
-    activeScreen(screen) {
-      if (screen === 'Home' && this.gameComplete) {
-        launchConfetti()
+
+    watch(
+      () => state.activeScreen,
+      currentScreen => {
+        if (currentScreen === 'Home' && state.gameComplete) {
+          launchConfetti()
+        }
       }
+    )
+
+    return {
+      ...toRefs(state),
+      registerSelection,
+      restartGame,
+      startGame,
+      updateMiniGame
     }
   }
 }
